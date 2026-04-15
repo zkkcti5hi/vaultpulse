@@ -1,0 +1,34 @@
+# vaultpulse example configuration
+# Copy this file to config.yaml and adjust values for your environment.
+
+vault:
+  # Address of your HashiCorp Vault server.
+  address: "http://127.0.0.1:8200"
+
+  # Vault token used to authenticate. Consider using VAULT_TOKEN env var instead.
+  token: "your-vault-token-here"
+
+  # (Optional) Vault namespace for Vault Enterprise.
+  # namespace: "admin"
+
+monitor:
+  # How often vaultpulse polls Vault for lease information.
+  interval: 5m
+
+  # List of secret paths to monitor for lease expiration.
+  secret_paths:
+    - secret/data/myapp/db
+    - secret/data/myapp/api
+
+alerts:
+  # Start warning this long before a secret expires.
+  warn_before: 72h
+
+  # Escalate to critical this long before a secret expires.
+  critical_before: 24h
+
+  # (Optional) Slack incoming webhook URL for alert notifications.
+  # slack_webhook: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
+
+  # (Optional) Email address to send alert notifications to.
+  # email_recipient: "ops@example.com"
