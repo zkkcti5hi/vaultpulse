@@ -2,7 +2,6 @@ package alert
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -84,5 +83,22 @@ func TestNotify_EmptyLeases(t *testing.T) {
 	if out != "" {
 		t.Errorf("expected no output for empty leases, got: %s", out)
 	}
-	fmt.Println() // suppress unused import warning
+}
+
+func TestNotify_WarningAlerted(t *testing.T) {
+	n := NewNotifier(Config{Channel: ChannelStdout, MinLevel: "warning"})
+	leases := []vault.Lease{
+		makeLease("lease-warn", "secret/svc", "warning", 20*time.Minute),
+	}
+	out := captureStdout(func() {
+		if err := n.Notify(leases); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+	if !strings.Contains(out, "[warning]") {
+		t.Errorf("expected warning alert in output, got: %s", out)
+	}
+	if !strings.Contains(out, "lease-warn") {
+		t.Errorf("expected lease ID in output, got: %s", out)
+	}
 }
