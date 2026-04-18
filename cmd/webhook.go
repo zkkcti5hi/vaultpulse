@@ -34,10 +34,15 @@ var webhookCmd = &cobra.Command{
 		}
 		annotated := vault.Annotate(leases, cfg.Thresholds.Warning, cfg.Thresholds.Critical)
 
+		if len(annotated) == 0 {
+			fmt.Println("No leases to report; skipping webhook delivery")
+			return nil
+		}
+
 		sender := alert.NewWebhookSender(cfg.WebhookURL)
 		if err := sender.Send(annotated); err != nil {
 			log.Printf("webhook error: %v", err)
-			return err
+			return fmt.Errorf("webhook delivery failed: %w", err)
 		}
 		fmt.Printf("Webhook delivered: %d lease(s) sent to %s\n", len(annotated), cfg.WebhookURL)
 		return nil
