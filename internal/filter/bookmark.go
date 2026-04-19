@@ -43,9 +43,13 @@ func (s *BookmarkStore) Get(name string) (Bookmark, error) {
 	return b, nil
 }
 
-// Delete removes a bookmark by name.
-func (s *BookmarkStore) Delete(name string) {
+// Delete removes a bookmark by name. Returns an error if the bookmark does not exist.
+func (s *BookmarkStore) Delete(name string) error {
+	if _, ok := s.books[name]; !ok {
+		return fmt.Errorf("bookmark %q not found", name)
+	}
 	delete(s.books, name)
+	return nil
 }
 
 // List returns all bookmark names sorted alphabetically.
