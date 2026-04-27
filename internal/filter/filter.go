@@ -32,6 +32,22 @@ func Apply(leases []vault.SecretLease, opts Options) []vault.SecretLease {
 	return result
 }
 
+// Count returns the number of leases that would be returned by Apply.
+// It is equivalent to len(Apply(leases, opts)) but avoids allocating a result slice.
+func Count(leases []vault.SecretLease, opts Options) int {
+	n := 0
+	for _, l := range leases {
+		if opts.PathPrefix != "" && !strings.HasPrefix(l.Path, opts.PathPrefix) {
+			continue
+		}
+		if opts.Severity != "" && !severityAtLeast(l.Severity, opts.Severity) {
+			continue
+		}
+		n++
+	}
+	return n
+}
+
 // severityAtLeast returns true when actual >= minimum in rank.
 func severityAtLeast(actual, minimum string) bool {
 	return rank(actual) >= rank(minimum)
